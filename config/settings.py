@@ -97,23 +97,23 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'railway',  # Database name
-#         'USER': 'postgres',  # Database user
-#         'PASSWORD': 'JdGzhLKwIhMlnrtxSMGeRdzKvrlvGbDB',  # Database password
-#         'HOST': 'turntable.proxy.rlwy.net',  # Database host
-#         'PORT': '11187',  # Database port
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',  # Database name
+        'USER': 'postgres',  # Database user
+        'PASSWORD': 'JdGzhLKwIhMlnrtxSMGeRdzKvrlvGbDB',  # Database password
+        'HOST': 'turntable.proxy.rlwy.net',  # Database host
+        'PORT': '11187',  # Database port
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 
 
