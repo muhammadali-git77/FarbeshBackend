@@ -1,0 +1,33 @@
+# Django loyihasi uchun tavsiya etilgan .gitignore
+
+# __pycache__ va compilatsiya qilingan fayllar
+__pycache__/
+*.py[cod]
+
+# Mahalliy muhit (virtual environment)
+venv/
+env/
+
+# Database fayllari
+db.sqlite3
+*.sqlite3
+
+# Django migration fayllari
+*/migrations/*
+
+# IDE va kod muharrirlar fayllari
+.vscode/
+.idea/
+
+# Log va kesh fayllari
+*.log
+*.pot
+*.mo
+staticfiles/
+media/
+
+# Git va boshqa tizimlarga tegishli fayllar
+.DS_Store
+.git/
+
+
