@@ -9,11 +9,11 @@ def home_view(request):
         # "Admin Panel": f"{BASE_URL}{reverse('admin:index')}",
         "Foydalanuvchilar API": f"{BASE_URL}/api/v1/",
         "Admin API": f"{BASE_URL}/api/v2/",
-        "Login": f"{BASE_URL}/auth/login/",
-        "Logout": f"{BASE_URL}/auth/logout/",
-        "Profile": f"{BASE_URL}/auth/user/",
-        "Parolni o'zgartirish": f"{BASE_URL}/auth/password/change/",
-        "Registratsiya": f"{BASE_URL}/auth/registration/",
+        "Login": f"{BASE_URL}/api/auth/login/",
+        "Logout": f"{BASE_URL}/api/auth/logout/",
+        "Profile": f"{BASE_URL}/api/auth/user/",
+        "Parolni o'zgartirish": f"{BASE_URL}/api/auth/api/password/change/",
+        "Registratsiya": f"{BASE_URL}/api/auth/registration/",
         # "AllAuth API": f"{BASE_URL}/api/allauth/",
     }
     return JsonResponse(urls)
