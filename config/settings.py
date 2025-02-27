@@ -10,11 +10,11 @@ CSRF_COOKIE_SECURE = True  # Agar HTTPS ishlatsang
 CSRF_COOKIE_SAMESITE = "Lax"  # Yoki "Strict"
 
 CORS_ALLOW_CREDENTIALS = True  # Cookie va sessionlarni ishlatish uchun
-# CORS_ALLOWED_ORIGINS = [
-#     "https://farbesh.up.railway.app",
-#     "http://localhost:5173",
-#     "http://localhost:5174"
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "https://farbesh.up.railway.app",
+    "http://localhost:5173",
+    "http://localhost:5174"
+]
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",
