@@ -4,11 +4,17 @@ import dj_database_url  # PostgreSQL URL bilan ishlash uchun
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# CSRF_TRUSTED_ORIGINS = ["https://farbesh.up.railway.app","http://localhost:5173","http://localhost:5174"]
+CSRF_USE_SESSIONS = True
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = True  # Agar HTTPS ishlatsang
+CSRF_COOKIE_SAMESITE = "Lax"  # Yoki "Strict"
 
 CORS_ALLOW_CREDENTIALS = True  # Cookie va sessionlarni ishlatish uchun
-CORS_ALLOW_ALL_ORIGINS = True
-
+# CORS_ALLOWED_ORIGINS = [
+#     "https://farbesh.up.railway.app",
+#     "http://localhost:5173",
+#     "http://localhost:5174"
+# ]
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",
@@ -22,14 +28,15 @@ CORS_ALLOW_HEADERS = [
     "content-type",
     "authorization",
     "x-csrftoken",
-]  # Frontend so‘rovlarida ishlatilishi mumkin bo‘lgan headerlar
-
+    "accept",
+    "origin",
+    "user-agent",
+    "x-requested-with"
+]
 
 SECRET_KEY = 'django-insecure-^a-7_ke^p@iwzlr)b!$$8%aw)5z0ipp6z@ne4$l#6#n=yng_ow'
 DEBUG = True
 ALLOWED_HOSTS = ['*']
-
-
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -42,19 +49,15 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'django_filters',
-
     'requests',
     'rest_framework',
     'rest_framework.authtoken',
-
     'corsheaders',
-
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    
     'app',
     'drivers_admin',
 ]
@@ -92,31 +95,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# PostgreSQL Database
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',  # Database name
-        'USER': 'postgres',  # Database user
-        'PASSWORD': 'JdGzhLKwIhMlnrtxSMGeRdzKvrlvGbDB',  # Database password
-        'HOST': 'turntable.proxy.rlwy.net',  # Database host
-        'PORT': '11187',  # Database port
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'JdGzhLKwIhMlnrtxSMGeRdzKvrlvGbDB',
+        'HOST': 'turntable.proxy.rlwy.net',
+        'PORT': '11187',
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -131,17 +119,14 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-
-STATIC_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
-MEDA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-ACCOUNT_EMAIL_VERIFICATION = "optional"  # Email berish mumkin, lekin tasdiqlash shart emas
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_EMAIL_REQUIRED = True
-
-
 SITE_ID = 1
 
 REST_FRAMEWORK = {
@@ -154,6 +139,5 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
-    
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
