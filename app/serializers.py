@@ -37,7 +37,12 @@ class OrderSerializer(serializers.Serializer):
     ]
 
     direction = serializers.ChoiceField(choices=DIRECTION_CHOICES)
+    location = serializers.JSONField()  # Lokatsiya uchun JSON field
     phone_number = serializers.CharField(max_length=13)
     passengers_count = serializers.IntegerField(min_value=1)
     gender = serializers.ChoiceField(choices=GENDER_CHOICES)
-        
+
+    def validate_location(self, value):
+        if not isinstance(value, dict) or 'latitude' not in value or 'longitude' not in value:
+            raise serializers.ValidationError("Location must contain 'latitude' and 'longitude' fields.")
+        return value

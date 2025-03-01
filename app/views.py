@@ -1,15 +1,12 @@
-# views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserCreateSerializer, OrderSerializer
+from .serializers import OrderSerializer
 from rest_framework import permissions
 import requests
-from rest_framework_simplejwt.tokens import RefreshToken
+import json
 
-
-
-#ORDER
+# ORDER
 TELEGRAM_BOT_TOKEN = "7795180366:AAFlB0h52Mf-wkK61ESb6b6__n1c6_pbNgw"
 TELEGRAM_GROUP_ID = "-1002446857055"
 
@@ -30,9 +27,16 @@ class SendOrderView(APIView):
                 f"📞 Telefon: {data['phone_number']}\n"
                 f"👥 Yo‘lovchilar: {data['passengers_count']} ({gender_text})"
             ) 
+            buttons = {
+                "inline_keyboard": [
+                    [
+                        {"text": "Buyurtmani olish", "callback_data": "confirm"},
+                    ]
+                ]
+            }
 
             url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-            payload = {"chat_id": TELEGRAM_GROUP_ID, "text": text}
+            payload = {"chat_id": TELEGRAM_GROUP_ID, "text": text, "reply_markup": json.dumps(buttons)}
 
             try:
                 response = requests.post(url, data=payload)
@@ -53,4 +57,3 @@ class SendOrderView(APIView):
                 )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
