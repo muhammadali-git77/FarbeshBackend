@@ -6,6 +6,8 @@ from rest_framework import permissions
 import requests
 import json
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 # ORDER
 TELEGRAM_BOT_TOKEN = "7795180366:AAFlB0h52Mf-wkK61ESb6b6__n1c6_pbNgw"
