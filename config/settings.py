@@ -9,6 +9,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "https://farbesh.up.railway.app",
+    "https://9488-188-113-196-197.ngrok-free.app"
 ]
 
 CSRF_USE_SESSIONS = True

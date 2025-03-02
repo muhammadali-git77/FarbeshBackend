@@ -1,16 +1,18 @@
-from rest_framework.views import APIView
+from rest_framework.views import APIView 
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import OrderSerializer
 from rest_framework import permissions
 import requests
 import json
-from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 TELEGRAM_BOT_TOKEN = "7795180366:AAFlB0h52Mf-wkK61ESb6b6__n1c6_pbNgw"
 TELEGRAM_GROUP_ID = "-1002446857055"
+
+order_owners = {}  # Buyurtmani kim bosganini saqlash uchun
+
 
 class SendOrderView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -55,6 +57,10 @@ class SendOrderView(APIView):
                         message_payload["reply_to_message_id"] = location_response["result"]["message_id"]
 
                 message_response = requests.post(message_url, data=message_payload).json()
+
+                if message_response.get("ok"):
+                    order_owners[message_response["result"]["message_id"]] = None
+
                 if not message_response.get("ok"):
                     return Response({"error": "Telegramga jo‘natishda xatolik!", "details": message_response}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -64,6 +70,7 @@ class SendOrderView(APIView):
                 return Response({"error": "Xatolik yuz berdi!", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TelegramCallbackView(APIView):
@@ -80,35 +87,47 @@ class TelegramCallbackView(APIView):
                 user_name = callback["from"]["first_name"]
                 user_id = callback["from"]["id"]
 
+                owner_id = order_owners.get(message_id)
+
                 if callback_data == "confirm":
-                    new_buttons = {
-                        "inline_keyboard": [
-                            [{"text": "✅ Buyurtma olindi", "callback_data": "done"}]
-                        ]
-                    }
-                    edit_payload = {
-                        "chat_id": chat_id,
-                        "message_id": message_id,
-                        "reply_markup": json.dumps(new_buttons)
-                    }
-                    requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
-                    
-                    new_buttons = {
-                        "inline_keyboard": [
-                            [{"text": "❌ Bekor qilish", "callback_data": f"cancel:{user_id}"}]
-                        ]
-                    }
-                    edit_payload["reply_markup"] = json.dumps(new_buttons)
-                    requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
+                    if owner_id is None:
+                        order_owners[message_id] = user_id
+                        new_buttons = {
+                            "inline_keyboard": [
+                                [{"text": "✅ Buyurtma olindi", "callback_data": "done"}],
+                                [{"text": "❌ Bekor qilish", "callback_data": f"cancel:{user_id}"}]
+                            ]
+                        }
+                    elif owner_id == user_id:
+                        new_buttons = {
+                            "inline_keyboard": [
+                                [{"text": "✅ Buyurtma olindi", "callback_data": "done"}],
+                                [{"text": "❌ Bekor qilish", "callback_data": f"cancel:{user_id}"}]
+                            ]
+                        }
+                    else:
+                        new_buttons = {
+                            "inline_keyboard": [
+                                [{"text": "✅ Buyurtma olindi", "callback_data": "done"}]
+                            ]
+                        }
+                elif callback_data.startswith("cancel") and str(user_id) == callback_data.split(":")[1]:
+                    new_buttons = {"inline_keyboard": [
+                        [{"text": "Buyurtmani olish", "callback_data": "confirm"}]
+                    ]}
+                    order_owners[message_id] = None
+                else:
+                    return Response({"message": "Siz bu amalni bajara olmaysiz"}, status=status.HTTP_403_FORBIDDEN)
 
-                if callback_data.startswith("cancel"):
-                    owner_id = callback_data.split(":")[1]
-                    if str(user_id) == owner_id:
-                        new_buttons = {"inline_keyboard": []}
-                        edit_payload["reply_markup"] = json.dumps(new_buttons)
-                        requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
-
+                edit_payload = {
+                    "chat_id": chat_id,
+                    "message_id": message_id,
+                    "reply_markup": json.dumps(new_buttons)
+                }
+                requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
                 return Response({"message": "Callback qabul qilindi"}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({"error": "Xatolik yuz berdi!", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"message": "Hech qanday amal bajarilmadi"}, status=status.HTTP_200_OK)
