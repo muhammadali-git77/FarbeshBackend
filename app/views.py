@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from rest_framework.views import APIView 
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import OrderSerializer
@@ -88,8 +88,7 @@ class TelegramCallbackView(APIView):
                 if callback_data == "confirm":
                     new_buttons = {
                         "inline_keyboard": [
-                            [{"text": "✅ Buyurtma olindi", "callback_data": f"confirmed:{user_id}"}],
-                            [{"text": "Bekor qilish", "callback_data": f"cancel:{user_id}"}]
+                            [{"text": "✅ Buyurtma olindi", "callback_data": f"confirmed:{user_id}"}]
                         ]
                     }
                     edit_payload = {
@@ -105,6 +104,22 @@ class TelegramCallbackView(APIView):
                         "text": text,
                         "reply_to_message_id": message_id
                     })
+
+                elif callback_data.startswith("confirmed"):
+                    _, owner_id = callback_data.split(":")
+                    if str(user_id) == owner_id:
+                        new_buttons = {
+                            "inline_keyboard": [
+                                [{"text": "✅ Buyurtma olindi", "callback_data": f"confirmed:{owner_id}"}],
+                                [{"text": "Bekor qilish", "callback_data": f"cancel:{owner_id}"}]
+                            ]
+                        }
+                        edit_payload = {
+                            "chat_id": chat_id,
+                            "message_id": message_id,
+                            "reply_markup": json.dumps(new_buttons)
+                        }
+                        requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
 
                 elif callback_data.startswith("cancel"):
                     _, owner_id = callback_data.split(":")
