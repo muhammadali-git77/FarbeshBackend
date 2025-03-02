@@ -33,7 +33,8 @@ class SendOrderView(APIView):
 
             buttons = {
                 "inline_keyboard": [
-                    [{"text": "Buyurtmani olish", "callback_data": "confirm"}]
+                    [{"text": "Buyurtmani olish", "callback_data": "confirm"}],
+                    [{"text": "Bekor qilish", "callback_data": "cancel"}]
                 ]
             }
 
@@ -97,6 +98,7 @@ class TelegramCallbackView(APIView):
                 if callback_data == "confirm":
                     new_buttons = {
                         "inline_keyboard": [
+                            [{"text": "✅ Buyurtma olindi", "callback_data": "confirmed", "callback_game": {}}],
                             [{"text": "Bekor qilish", "callback_data": "cancel"}]
                         ]
                     }
@@ -106,13 +108,6 @@ class TelegramCallbackView(APIView):
                         "reply_markup": json.dumps(new_buttons)
                     }
                     requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
-
-                    text = f"✅ Buyurtma olindi: {user_name}"
-                    requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage", data={
-                        "chat_id": chat_id,
-                        "text": text,
-                        "reply_to_message_id": message_id
-                    })
 
                 elif callback_data == "cancel":
                     new_buttons = {
