@@ -35,17 +35,34 @@ class SendOrderView(APIView):
             }
 
             message_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-            message_payload = {
-                "chat_id": TELEGRAM_GROUP_ID,
-                "text": text,
-                "reply_markup": json.dumps(buttons)
-            }
-            message_response = requests.post(message_url, data=message_payload).json()
+            location_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendLocation"
 
-            if message_response.get("ok"):
+            try:
+                message_payload = {
+                    "chat_id": TELEGRAM_GROUP_ID,
+                    "text": text,
+                    "reply_markup": json.dumps(buttons)
+                }
+
+                if "latitude" in data and "longitude" in data:
+                    location_payload = {
+                        "chat_id": TELEGRAM_GROUP_ID,
+                        "latitude": float(data["latitude"]),
+                        "longitude": float(data["longitude"])
+                    }
+                    location_response = requests.post(location_url, data=location_payload).json()
+                    if location_response.get("ok"):
+                        message_payload["reply_to_message_id"] = location_response["result"]["message_id"]
+
+                message_response = requests.post(message_url, data=message_payload).json()
+                if not message_response.get("ok"):
+                    return Response({"error": "Telegramga jo‘natishda xatolik!", "details": message_response}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
                 return Response({"message": "Buyurtma qabul qilindi!"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": "Telegramga jo‘natishda xatolik!"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            except Exception as e:
+                return Response({"error": "Xatolik yuz berdi!", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -66,8 +83,7 @@ class TelegramCallbackView(APIView):
                 if callback_data == "confirm":
                     new_buttons = {
                         "inline_keyboard": [
-                            [{"text": "✅ Buyurtma olindi", "callback_data": "confirmed", "callback_data": f"confirmed:{user_id}"}],
-                            [{"text": "Bekor qilish", "callback_data": f"cancel:{user_id}"}]
+                            [{"text": "✅ Buyurtma olindi", "callback_data": f"confirmed:{user_id}"}]
                         ]
                     }
                     edit_payload = {
@@ -84,27 +100,7 @@ class TelegramCallbackView(APIView):
                         "reply_to_message_id": message_id
                     })
 
-                elif callback_data.startswith("cancel"):
-                    _, owner_id = callback_data.split(":")
-                    if str(user_id) == owner_id:
-                        new_buttons = {
-                            "inline_keyboard": [
-                                [{"text": "Buyurtmani olish", "callback_data": "confirm"}]
-                            ]
-                        }
-                        edit_payload = {
-                            "chat_id": chat_id,
-                            "message_id": message_id,
-                            "reply_markup": json.dumps(new_buttons)
-                        }
-                        requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
+                return Response({"message": "Callback qabul qilindi"}, status=status.HTTP_200_OK)
 
-                        text = f"🚫 Buyurtma bekor qilindi: {user_name}"
-                        requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage", data={
-                            "chat_id": chat_id,
-                            "text": text,
-                            "reply_to_message_id": message_id
-                        })
-            return Response({"message": "Callback qabul qilindi"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": "Xatolik yuz berdi!", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
