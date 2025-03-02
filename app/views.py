@@ -81,6 +81,8 @@ class SendOrderView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TelegramCallbackView(APIView):
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         try:
             update = request.data
