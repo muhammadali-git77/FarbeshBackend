@@ -77,7 +77,7 @@ class SendOrderView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class TelegramCallbackView(APIView):
     def post(self, request):
         try:
