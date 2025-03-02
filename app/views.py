@@ -8,7 +8,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-TELEGRAM_BOT_TOKEN = "7795180366:AAFlB0h52Mf-wkK61ESb6b6__n1c6_pbNgw"
+TELEGRAM_BOT_TOKEN = '7800984825:AAEPAd2o_vtfrGlUwc7X7g2wHPCbJmriaX8'
 TELEGRAM_GROUP_ID = "-1002446857055"
 
 order_owners = {}  # Buyurtmani kim bosganini saqlash uchun
