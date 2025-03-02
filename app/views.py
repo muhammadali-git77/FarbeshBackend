@@ -1,4 +1,4 @@
-from rest_framework.views import APIView 
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import OrderSerializer
@@ -68,7 +68,6 @@ class SendOrderView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class TelegramCallbackView(APIView):
     permission_classes = [permissions.AllowAny]
-    taken_orders = {}
 
     def post(self, request):
         try:
@@ -82,14 +81,9 @@ class TelegramCallbackView(APIView):
                 user_id = callback["from"]["id"]
 
                 if callback_data == "confirm":
-                    if message_id in self.taken_orders:
-                        return Response({"message": "Bu buyurtma allaqachon olingan"}, status=status.HTTP_200_OK)
-
-                    self.taken_orders[message_id] = user_id
-
                     new_buttons = {
                         "inline_keyboard": [
-                            [{"text": "✅ Buyurtma olindi", "callback_data": "confirmed"}]
+                            [{"text": "✅ Buyurtma olindi", "callback_data": "done"}]
                         ]
                     }
                     edit_payload = {
@@ -98,30 +92,20 @@ class TelegramCallbackView(APIView):
                         "reply_markup": json.dumps(new_buttons)
                     }
                     requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
+                    
+                    new_buttons = {
+                        "inline_keyboard": [
+                            [{"text": "❌ Bekor qilish", "callback_data": f"cancel:{user_id}"}]
+                        ]
+                    }
+                    edit_payload["reply_markup"] = json.dumps(new_buttons)
+                    requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
 
-                elif callback_data == "confirmed":
-                    if message_id in self.taken_orders and self.taken_orders[message_id] == user_id:
-                        new_buttons = {
-                            "inline_keyboard": [
-                                [{"text": "❌ Bekor qilish", "callback_data": f"cancel:{user_id}"}]
-                            ]
-                        }
-                        edit_payload = {
-                            "chat_id": chat_id,
-                            "message_id": message_id,
-                            "reply_markup": json.dumps(new_buttons)
-                        }
-                        requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
-
-                elif callback_data.startswith("cancel"):
-                    taken_user_id = int(callback_data.split(":")[1])
-                    if user_id == taken_user_id:
-                        del self.taken_orders[message_id]
-                        edit_payload = {
-                            "chat_id": chat_id,
-                            "message_id": message_id,
-                            "reply_markup": json.dumps({"inline_keyboard": []})
-                        }
+                if callback_data.startswith("cancel"):
+                    owner_id = callback_data.split(":")[1]
+                    if str(user_id) == owner_id:
+                        new_buttons = {"inline_keyboard": []}
+                        edit_payload["reply_markup"] = json.dumps(new_buttons)
                         requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup", data=edit_payload)
 
                 return Response({"message": "Callback qabul qilindi"}, status=status.HTTP_200_OK)
