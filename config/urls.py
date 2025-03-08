@@ -19,6 +19,8 @@ urlpatterns = [
     # Authentifikatsiya va ro‘yxatdan o‘tish
     path("api/auth/", include("dj_rest_auth.urls")),  # Login, logout, user info
     path("api/auth/registration/", include("dj_rest_auth.registration.urls")),  # Registratsiya
+    path('accounts/', include('allauth.urls')),
+   
 
     # JWT Token uchun URL'lar
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),  # Login (token olish)

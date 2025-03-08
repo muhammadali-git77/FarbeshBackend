@@ -34,11 +34,12 @@ class OrderSerializer(serializers.Serializer):
     GENDER_CHOICES = [
         ("male", "Erkak"),
         ("female", "Ayol"),
+        ("mail", "Po'chta")
     ]
 
     direction = serializers.ChoiceField(choices=DIRECTION_CHOICES)
     phone_number = serializers.CharField(max_length=13)
-    passengers_count = serializers.IntegerField(min_value=1)
+    passengers_count = serializers.IntegerField(min_value=0)
     gender = serializers.ChoiceField(choices=GENDER_CHOICES)
     latitude = serializers.FloatField(required=True, allow_null=True)  # Lokatsiya koordinatalari
     longitude = serializers.FloatField(required=True,allow_null=True)

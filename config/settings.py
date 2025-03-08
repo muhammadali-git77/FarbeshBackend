@@ -1,16 +1,16 @@
 from pathlib import Path
 from datetime import timedelta
-import dj_database_url  # PostgreSQL URL bilan ishlash uchun
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS = [
+CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://localhost:5174",
+    "http://127.0.0.1:5173",
     "https://farbesh.up.railway.app",
-    "https://9488-188-113-196-197.ngrok-free.app"
 ]
+
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_HTTPONLY = True
@@ -27,7 +27,7 @@ else:
 
 
 CORS_ALLOW_CREDENTIALS = True  # Cookie va sessionlarni ishlatish uchun
-CORS_ALLOW_ALL_ORIGINS = True
+
 
 CORS_ALLOW_METHODS = [
     "GET",
@@ -36,13 +36,13 @@ CORS_ALLOW_METHODS = [
     "PATCH",
     "DELETE",
     "OPTIONS",
-]  # Ruxsat berilgan HTTP metodlar
+] 
 
 CORS_ALLOW_HEADERS = [
-    "content-type",
-    "authorization",
-    "x-csrftoken",
-]  # Frontend so‘rovlarida ishlatilishi mumkin bo‘lgan headerlar
+    "Content-Type",
+    "Authorization",
+    "X-CSRFToken",
+]
 
 
 SECRET_KEY = 'django-insecure-^a-7_ke^p@iwzlr)b!$$8%aw)5z0ipp6z@ne4$l#6#n=yng_ow'
@@ -60,27 +60,42 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-
     'django_filters',
-
     'requests',
     'rest_framework',
     'rest_framework.authtoken',
-
     'corsheaders',
-
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    
+    'allauth.socialaccount.providers.google',    
     'app',
     'drivers_admin',
 ]
+
+
+
+AUTHENTICATION_BACKENDS = [
+    'app.backends.EmailOrUsernameBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
+
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -93,6 +108,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -125,18 +141,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'railway',  # Database name
         'USER': 'postgres',  # Database user
-        'PASSWORD': 'JdGzhLKwIhMlnrtxSMGeRdzKvrlvGbDB',  # Database password
-        'HOST': 'turntable.proxy.rlwy.net',  # Database host
-        'PORT': '11187',  # Database port
+        'PASSWORD': 'rCYzchCYrDASnkehkZySMAHXTEzyYUQE',  # Database password
+        'HOST': 'shuttle.proxy.rlwy.net',  # Database host
+        'PORT': '38457',  # Database port
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'

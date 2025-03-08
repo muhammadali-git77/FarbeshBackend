@@ -21,14 +21,23 @@ class SendOrderView(APIView):
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            gender_text = "Erkak" if data["gender"] == "male" else "Ayol"
+            gender_text = "Erkak" if data["gender"] == "male" else "Ayol" if data["gender"] == "female" else "Po'chta"
 
-            text = (
-                f"🚖 **Yangi Buyurtma** 🚖\n"
-                f"📍 Yo‘nalish: {data['direction']}\n"
-                f"📞 Telefon: {data['phone_number']}\n"
-                f"👥 Yo‘lovchilar: {data['passengers_count']} ({gender_text})"
+
+            if data["gender"] == "mail":
+                text = (
+                    f"🚖 **Yangi Buyurtma** 🚖\n"
+                    f"📍 Yo‘nalish: {data['direction']}\n"
+                    f"📞 Telefon: {data['phone_number']}\n"
+                    f"📦 Po‘chta: ✅"
             )
+            else:
+                text = (
+                    f"🚖 **Yangi Buyurtma** 🚖\n"
+                    f"📍 Yo‘nalish: {data['direction']}\n"
+                    f"📞 Telefon: {data['phone_number']}\n"
+                    f"👥 Yo‘lovchilar: {data['passengers_count']} ({gender_text})"
+                )
 
             buttons = {
                 "inline_keyboard": [
