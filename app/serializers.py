@@ -34,7 +34,7 @@ class OrderSerializer(serializers.Serializer):
     GENDER_CHOICES = [
         ("male", "Erkak"),
         ("female", "Ayol"),
-        ("mail", "Po'chta")
+        ("mail", "Pochta")
     ]
 
     direction = serializers.ChoiceField(choices=DIRECTION_CHOICES)
