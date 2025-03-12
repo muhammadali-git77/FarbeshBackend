@@ -29,7 +29,7 @@ class SendOrderView(APIView):
                     f"🚖 **Yangi Buyurtma** 🚖\n"
                     f"📍 Yo‘nalish: {data['direction']}\n"
                     f"📞 Telefon: {data['phone_number']}\n"
-                    f"📦 Po‘chta: ✅"
+                    f"📦 Pochta: ✅"
             )
             else:
                 text = (
