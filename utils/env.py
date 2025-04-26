@@ -1,0 +1,11 @@
+from environs import Env
+
+env = Env()
+env.read_env()
+
+TELEGRAM_ID = env('TELEGRAM_ID')
+TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN')
+POSTGRE_USER = env('POSTGRE_USER')
+POSTGRE_PASS = env('POSTGRE_PASS')
+POSTGRE_HOST = env('POSTGRE_HOST')
+POSTGRE_PORT = env('POSTGRE_PORT')
