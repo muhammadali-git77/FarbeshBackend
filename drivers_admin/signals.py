@@ -5,10 +5,10 @@ from datetime import timedelta
 from .models import Driver
 import requests
 
+from utils.env import TELEGRAM_ID,TELEGRAM_BOT_TOKEN
 
-
-TELEGRAM_BOT_TOKEN = '7800984825:AAEPAd2o_vtfrGlUwc7X7g2wHPCbJmriaX8'  
-TELEGRAM_GROUP_ID = '-1002446857055' 
+  
+TELEGRAM_GROUP_ID = TELEGRAM_ID 
 
 @receiver(post_save, sender=Driver)
 def send_telegram_invite_link(sender, instance, **kwargs):
