@@ -1,33 +1,47 @@
-# Django loyihasi uchun tavsiya etilgan .gitignore
-
-# __pycache__ va compilatsiya qilingan fayllar
+# Python
 __pycache__/
 *.py[cod]
 
-# Mahalliy muhit (virtual environment)
+# Virtual Environments
 venv/
 env/
+.venv/
+ENV/
 
-# Database fayllari
+# Django
 db.sqlite3
 *.sqlite3
 
-# Django migration fayllari
-*/migrations/*
+# Django Migrations
+**/migrations/*.py
+!**/migrations/__init__.py
 
-# IDE va kod muharrirlar fayllari
+# Static and Media
+/staticfiles/
+/media/
+
+# Secret files
+.env
+
+# IDE and Editor settings
 .vscode/
 .idea/
 
-# Log va kesh fayllari
+# Logs and Caches
 *.log
 *.pot
 *.mo
-staticfiles/
-media/
 
-# Git va boshqa tizimlarga tegishli fayllar
+# OS Specific
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# Git system
 .git/
 
-
+# Node.js (agar frontend ham bo‘lsa)
+node_modules/
+npm-debug.log
+yarn-error.log
